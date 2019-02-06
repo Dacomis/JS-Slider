@@ -12,7 +12,7 @@ function nextSlide(){
 }
 
 function previousSlide(){
-	  goToSlide(currentSlide-1);
+	goToSlide(currentSlide-1);
 }
 
 function goToSlide(n){
