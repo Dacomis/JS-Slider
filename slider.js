@@ -7,36 +7,30 @@ var slides = document.querySelectorAll('#slides .slide');
 var currentSlide = 0;
 var slideInterval = setInterval(nextSlide,5000);
 
-function nextSlide(){
-    goToSlide(currentSlide+1);
+function nextSlide() {
+  goToNextSlide();
 }
 
-function previousSlide(){
+function previousSlide() {
 	goToSlide(currentSlide-1);
-}
-
-function goToSlide(n){
-    slides[currentSlide].className = 'slide';
-    currentSlide = (n + slides.length)%slides.length;
-    slides[currentSlide].className = 'slide showing';
 }
 
 var playing = true;
 var pauseButton = document.getElementById('pause');
 
-function pauseSlideshow(){
+function pauseSlideshow() {
     pauseButton.innerHTML = '&#9658;'; 
     playing = false;
     clearInterval(slideInterval);
 }
 
-function playSlideshow(){
+function playSlideshow() {
     pauseButton.innerHTML = '&#10074;&#10074;'; 
     playing = true;
     slideInterval = setInterval(nextSlide,5000);
 }
 
-pauseButton.onclick = function(){
+pauseButton.onclick = function() {
     if(playing){ pauseSlideshow(); }
     else{ playSlideshow(); }
 };
@@ -44,11 +38,47 @@ pauseButton.onclick = function(){
 var next = document.getElementById('next');
 var previous = document.getElementById('previous');
 
-next.onclick = function(){
-    pauseSlideshow();
-    nextSlide();
-};
-previous.onclick = function(){
-    pauseSlideshow();
-    previousSlide();
-};
+function goToNextSlide() {
+  const container = $('#slides');
+  const currentSlide = $(".slide.showing");
+  const prevSlide = $(slides[currentSlide.index() - 1]);
+  const nextSlide = $(slides[currentSlide.index() + 1]);
+
+    currentSlide.animate({"left": -currentSlide.outerWidth()}, "fast", complete => {
+      currentSlide.css('left', '100%');
+    });
+    nextSlide.animate({"left": 0}, "fast", complete => {
+      nextSlide.css('left', '0');
+    });
+
+    currentSlide.removeClass('showing');
+    nextSlide.addClass('showing');
+
+    container[0].appendChild(prevSlide[0]);
+    slides = document.querySelectorAll('#slides .slide');
+}
+
+function goToPrevSlide() {
+  const container = $('#slides');
+  const currentSlide = $(".slide.showing");
+  const prevSlide = $(slides[currentSlide.index() - 1]);
+  const lastSlide = $(slides[slides.length - 1]);
+
+    currentSlide.animate({"left": currentSlide.outerWidth()}, "fast", complete => {
+      currentSlide.css('left', '100%');
+    });
+    prevSlide.css('left', '-100%');
+    prevSlide.animate({"left": 0}, "fast", complete => {
+      prevSlide.css('left', '0');
+    });
+
+    currentSlide.removeClass('showing');
+    prevSlide.addClass('showing');
+
+    container[0].prepend(lastSlide[0]);
+    slides = document.querySelectorAll('#slides .slide');
+}
+
+$("#next").on('click', goToNextSlide);
+  
+$("#previous").on('click', goToPrevSlide);
